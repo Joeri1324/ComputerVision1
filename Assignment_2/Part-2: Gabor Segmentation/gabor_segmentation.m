@@ -188,6 +188,9 @@ if smoothingFlag
         % i)  filter the magnitude response with appropriate Gaussian kernels
         % ii) insert the smoothed image into features(:,:,jj)
     %END_FOR
+    for jj = 1:length(featureMags)
+        features(:,:,jj) = imgaussfilt(featureMags{jj});
+    end
 else
     % Don't smooth but just insert magnitude images into the matrix
     % called features.
