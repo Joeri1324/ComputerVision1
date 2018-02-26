@@ -86,3 +86,10 @@ imshow(im_magnitude)
 subplot(2, 2, 4)
 imshow(im_direction)
 
+%%
+
+I = im2double(imread('./images/image1.jpg'));
+imshow(compute_LoG(I, 3));
+
+
+
