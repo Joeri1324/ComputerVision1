@@ -58,10 +58,12 @@ sinCarrier = createSin(rot_x, lambda, psi);
 
 % Modulate (multiply) Gaussian envelope with the carriers to compute 
 % the real and imaginary components of the omplex Gabor filter. 
-myGabor_real = gaussianEnv * cosCarrier;
-myGabor_imaginary = gaussianEnv * sinCarrier;
+myGabor_real =  cosCarrier * gaussianEnv;
+myGabor_imaginary =  sinCarrier * gaussianEnv ;
 
 % Pack myGabor_real and myGabor_imaginary into myGabor.
+disp('real')
+disp(size(myGabor_real));
 myGabor(:,:,1) = myGabor_real;
 myGabor(:,:,2) = myGabor_imaginary;
 
@@ -84,7 +86,6 @@ end
 function cosCarrier = createCos(rot_x, lambda, psi)
 % ----------------------------------------------------------
 % Returns the 2D cosine carrier. 
-    disp(rot_x);
     cosCarrier = cos(2 * pi * rot_x / lambda + psi);
 
     % Reshape the vector representation to matrix.

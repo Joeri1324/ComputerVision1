@@ -1,7 +1,7 @@
 %% Hyperparameters
 k        = 2;      % number of clusters in k-means algorithm. By default, 
                    % we consider k to be 2 in foreground-background segmentation task.
-image_id = 'Kobi'; % Identifier to switch between input images.
+image_id = 'Robin-2'; % Identifier to switch between input images.
                    % Possible ids: 'Kobi',    'Polar', 'Robin-1'
                    %               'Robin-2', 'Cows'
 
@@ -9,28 +9,28 @@ image_id = 'Kobi'; % Identifier to switch between input images.
 err_msg  = 'Image not available.';
 
 % Control settings
-visFlag       = false;    %  Set to true to visualize filter responses.
+visFlag       = true;    %  Set to true to visualize filter responses.
 smoothingFlag = true;   %  Set to true to postprocess filter outputs.
 
 %% Read image
 switch image_id
     case 'Kobi'
-        img = imread('kobi.png');
+        img = im2double(imread('kobi.png'));
         resize_factor = 0.25;
     case 'Polar'
-        img = imread('./data/polar-bear-hiding.jpg');
+        img = im2double(imread('./data/polar-bear-hiding.jpg'));
         resize_factor = 0.75;
     case 'Robin-1'
-        img = imread('./data/robin-1.jpg');
+        img = im2double(imread('./data/robin-1.jpg'));
         resize_factor = 1;
     case 'Robin-2'
-        img = imread('./data/robin-2.jpg');
+        img = im2double(imread('./data/robin-2.jpg'));
         resize_factor = 0.5;
     case 'Cows'
-        img = imread('./data/cows.jpg');
+        img = im2double(imread('./data/cows.jpg'));
         resize_factor = 0.5;
     case 'SciencePark'
-        img = imread('./data/sciencepark.jpg');
+        img = im2double(imread('./data/sciencepark.jpg'));
         img = permute(img,[2,1,3]);
         resize_factor = 0.2;      
         
@@ -133,13 +133,15 @@ fprintf('--------------------------------------\n')
 %            explain what works better and why shortly in the report.
 featureMaps = cell(length(gaborFilterBank),1);
 for jj = 1 : length(gaborFilterBank)
-    real_out = gaborFilterBank(jj).filterPairs(1);
-    imag_out = gaborFilterBank(jj).filterPairs(2);
+    real_filter = gaborFilterBank(jj).filterPairs(:, :, 1);
+    imag_filter = gaborFilterBank(jj).filterPairs(:, :, 2);
+    real_out = imfilter(img_gray, real_filter);
+    imag_out = imfilter(img_gray, imag_filter);
     featureMaps{jj} = cat(3, real_out, imag_out);
     
     % Visualize the filter responses if you wish.
     if visFlag
-        figure(2),
+        figure,
         subplot(121), imshow(real_out), title(sprintf('Re[h(x,y)], \\lambda = %f, \\theta = %f, \\sigma = %f',gaborFilterBank(jj).lambda,...
                                                                                                               gaborFilterBank(jj).theta,...
                                                                                                               gaborFilterBank(jj).sigma));
@@ -158,8 +160,8 @@ featureMags =  cell(length(gaborFilterBank),1);
 for jj = 1:length(featureMaps)
     real_part = featureMaps{jj}(:,:,1);
     imag_part = featureMaps{jj}(:,:,2);
-    featureMags{jj} = (real_part^2 + imag_part^2)^(1/2);
-    
+    featureMags{jj} = sqrt((real_part .^ 2 + imag_part.^2));
+    % featureMags{jj} = real_part;
     % Visualize the magnitude response if you wish.
     if visFlag
         figure(3), 
@@ -189,13 +191,14 @@ if smoothingFlag
         % ii) insert the smoothed image into features(:,:,jj)
     %END_FOR
     for jj = 1:length(featureMags)
+        disp(size(featureMags{jj}));
         features(:,:,jj) = imgaussfilt(featureMags{jj});
     end
 else
     % Don't smooth but just insert magnitude images into the matrix
     % called features.
     for jj = 1:length(featureMags)
-        features(:,:,jj) = featureMags{jj};
+        features(:, :, jj) = featureMags{jj};
     end
 end
 
@@ -211,7 +214,7 @@ features = reshape(features, numRows * numCols, []);
 % \\ Hint: see http://ufldl.stanford.edu/wiki/index.php/Data_Preprocessing
 %          for more information. \\
 
-features = zscore(features);
+% features = zscore(features);
 
 % (Optional) Visualize the saliency map using the first principal component 
 % of the features matrix. It will be useful to diagnose possible problems 
