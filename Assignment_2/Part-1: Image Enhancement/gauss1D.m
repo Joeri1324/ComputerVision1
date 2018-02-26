@@ -3,7 +3,7 @@ function G = gauss1D( sigma , kernel_size )
         error('kernel_size must be odd, otherwise the filter will not have a center to convolve on')
     end 
     x = -floor(kernel_size/2):floor(kernel_size/2);
-    G =  exp(- x.^2 ./ (2 * (sigma^2)));
+    G = exp(- x.^2 ./ (2 * (sigma^2)));
     G = G ./ sum(G);
     
     % left-hand sight of the gaussian is just a scalar, since the kernel

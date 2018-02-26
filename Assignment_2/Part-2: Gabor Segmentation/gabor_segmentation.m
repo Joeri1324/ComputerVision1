@@ -122,7 +122,7 @@ fprintf('--------------------------------------\n')
 % You will now filter the input image with each complex Gabor filter in 
 % gaborFilterBank structure and store the output in the cell called 
 % featureMaps. 
-% // Hint-1: Apply both the real imaginary parts of each kernel 
+% // Hint-1: Apply both the real and imaginary parts of each kernel 
 %            separately in the spatial domain (i.e. over the image). //
 % // Hint-2: Assign each output (i.e. real and imaginary parts) in
 %            variables called real_out and imag_out. //
@@ -133,8 +133,8 @@ fprintf('--------------------------------------\n')
 %            explain what works better and why shortly in the report.
 featureMaps = cell(length(gaborFilterBank),1);
 for jj = 1 : length(gaborFilterBank)
-    real_out =  % \\TODO: filter the grayscale input with real part of the Gabor
-    imag_out =  % \\TODO: filter the grayscale input with imaginary part of the Gabor
+    real_out = gaborFilterBank(jj).filterPairs(1);
+    imag_out = gaborFilterBank(jj).filterPairs(2);
     featureMaps{jj} = cat(3, real_out, imag_out);
     
     % Visualize the filter responses if you wish.
@@ -158,7 +158,7 @@ featureMags =  cell(length(gaborFilterBank),1);
 for jj = 1:length(featureMaps)
     real_part = featureMaps{jj}(:,:,1);
     imag_part = featureMaps{jj}(:,:,2);
-    featureMags{jj} = % \\TODO: Compute the magnitude here
+    featureMags{jj} = (real_part^2 + imag_part^2)^(1/2);
     
     % Visualize the magnitude response if you wish.
     if visFlag
@@ -208,9 +208,7 @@ features = reshape(features, numRows * numCols, []);
 % \\ Hint: see http://ufldl.stanford.edu/wiki/index.php/Data_Preprocessing
 %          for more information. \\
 
-features = % \\ TODO: i)  Implement standardization on matrix called features. 
-           %          ii) Return the standardized data matrix.
-
+features = zscore(features);
 
 % (Optional) Visualize the saliency map using the first principal component 
 % of the features matrix. It will be useful to diagnose possible problems 
@@ -227,7 +225,7 @@ imshow(feature2DImage,[]), title('Pixel representation projected onto first PC')
 % \\ Hint-2: use the parameter k defined in the first section when calling
 %            MATLAB's built-in kmeans function.
 tic
-pixLabels = % \\TODO: Return cluster labels per pixel
+pixLabels = kmeans(features, k);% \\TODO: Return cluster labels per pixel
 ctime = toc;
 fprintf('Clustering completed in %.3f seconds.\n', ctime);
 
@@ -235,7 +233,7 @@ fprintf('Clustering completed in %.3f seconds.\n', ctime);
 
 % Visualize the clustering by reshaping pixLabels into original grayscale
 % input size [numRows numCols].
-pixLabels = reshape(pixLabels,[numRows numCols]);
+pixLabels = reshape(pixLabels, [numRows numCols]);
 
 figure(5)
 imshow(label2rgb(pixLabels)), title('Pixel clusters');
