@@ -1,7 +1,7 @@
 %% Hyperparameters
 k        = 2;      % number of clusters in k-means algorithm. By default, 
                    % we consider k to be 2 in foreground-background segmentation task.
-image_id = 'Robin-2'; % Identifier to switch between input images.
+image_id = 'Kobi'; % Identifier to switch between input images.
                    % Possible ids: 'Kobi',    'Polar', 'Robin-1'
                    %               'Robin-2', 'Cows'
 
@@ -9,8 +9,8 @@ image_id = 'Robin-2'; % Identifier to switch between input images.
 err_msg  = 'Image not available.';
 
 % Control settings
-visFlag       = true;    %  Set to true to visualize filter responses.
-smoothingFlag = true;   %  Set to true to postprocess filter outputs.
+visFlag       = false;    %  Set to true to visualize filter responses.
+smoothingFlag = false;   %  Set to true to postprocess filter outputs.
 
 %% Read image
 switch image_id
@@ -64,15 +64,15 @@ lambdaMax = hypot(numRows,numCols);
 % Specify the carrier wavelengths.  
 % (or the central frequency of the carrier signal, which is 1/lambda)
 n = floor(log2(lambdaMax/lambdaMin));
-lambdas = 2.^(0:(n-2)) * lambdaMin;
+lambdas = (2.^(0:(n-2)) * lambdaMin);
 
 % Define the set of orientations for the Gaussian envelope.
 dTheta      = 2*pi/8;                  % \\ the step size
-orientations = 0:dTheta:(pi/2);       
+orientations = 0:dTheta:(pi/2) ;       
 
 % Define the set of sigmas for the Gaussian envelope. Sigma here defines 
 % the standard deviation, or the spread of the Gaussian. 
-sigmas = [1,2]; 
+sigmas = [1,2] .* 2; 
 
 % Now you can create the filterbank. We provide you with a MATLAB struct
 % called gaborFilterBank in which we will hold the filters and their
@@ -90,7 +90,7 @@ for ii = 1:length(lambdas)
             sigma  = sigmas(jj);            
             theta  = orientations(ll);
             psi    = 0;
-            gamma  = 0.5;
+            gamma  = 3.5;
             
             % Create a Gabor filter with the specs above. 
             % (We also record the settings in which they are created. )
@@ -185,11 +185,6 @@ end
 % \\ Hint: doc imfilter, doc fspecial or doc imgaussfilt.  
 features = zeros(numRows, numCols, length(featureMags));
 if smoothingFlag
-    % \\TODO:
-    %FOR_LOOP
-        % i)  filter the magnitude response with appropriate Gaussian kernels
-        % ii) insert the smoothed image into features(:,:,jj)
-    %END_FOR
     for jj = 1:length(featureMags)
         disp(size(featureMags{jj}));
         features(:,:,jj) = imgaussfilt(featureMags{jj});
