@@ -1,6 +1,6 @@
 function [H, r, c] = harris_corner_detector(I, treshold)
 
-grayI = rgb2gray(I)
+grayI = rgb2gray(I);
 % Gaussian derivative filters to x and to y
 G = fspecial('gauss', [3, 3]);
 Gx = fspecial('gauss', [1, 3]);

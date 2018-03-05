@@ -3,10 +3,10 @@ J = im2double(imread('person_toy/00000001.jpg'));
 I = im2double(imread('pingpong/0000.jpeg'));
 
 figure
-harris_corner_detector(I, 0.005);
+harris_corner_detector(I, 0.001);
 
 figure
-harris_corner_detector(J, 0.005);
+harris_corner_detector(J, 0.001);
 
 %% Rotated image
 
