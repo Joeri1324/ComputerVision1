@@ -18,4 +18,13 @@ harris_corner_detector(rotatedJ, 0.005);
 I = im2double(imread('sphere1.ppm'));
 J = im2double(imread('sphere2.ppm'));
 
-lucas_kanade(I, J)
+R = lucas_kanade(I, J);
+[~, r, c] = harris_corner_detector(I, 0.002);
+
+disp('fish')
+disp(R(r(6), c(6), :));
+
+
+%%
+
+tracking('./pingpong/', 0.005)
