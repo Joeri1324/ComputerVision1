@@ -1,9 +1,8 @@
 
 
 function tracking(folder_name, treshold) 
-    imageNames = dir(strcat(folder_name, '*.jpeg'));
+    imageNames = dir(strcat(folder_name, '*.jpg'));
     
-    disp(imageNames);
     imageNames = {imageNames.name}';
 
     outputVideo = VideoWriter(fullfile(folder_name, 'movie.avi'));
@@ -11,7 +10,7 @@ function tracking(folder_name, treshold)
     open(outputVideo)
     
     img = im2double(imread(strcat(folder_name, imageNames{1})));
-    [~, r, c] = harris_corner_detector(img, treshold);
+    [~, r, c] = harris_corner_detector(img, treshold, treshold);
     colored_img = color_edge(img, r, c);
     
     writeVideo(outputVideo, colored_img)
@@ -19,19 +18,14 @@ function tracking(folder_name, treshold)
     for ii = 1:length(imageNames)-1
        img1 = im2double(imread(strcat(folder_name, imageNames{ii})));
        img2 = im2double(imread(strcat(folder_name, imageNames{ii+1})));
-       result = lucas_kanade(img1, img2);
+       result = lucas_kanade(img1, img2, false);
        
 
        for vv = 1:length(r)
-%            disp(size(result))
-%            disp(c(vv))
-%            disp(r(vv))
  
-           difU = 10 * result(r(vv), c(vv), 1);
+           difU = result(r(vv), c(vv), 1);
            difV = result(r(vv), c(vv), 2);
-           
-    
-           disp(difU);
+
            r(vv) = round(r(vv) + difV);
            c(vv) = round(c(vv) + difU);
        end
@@ -52,9 +46,7 @@ function tracking(folder_name, treshold)
     
     figure
     imshow(mov(1).cdata, 'Border', 'tight')
-    
-    % [H, r, c] = harris_corner_detector(image1, treshold)
-    
-   %  vis(image1, r, c)
+
+    movie(mov,1, avi.FrameRate)
 end
 

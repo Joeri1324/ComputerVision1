@@ -1,4 +1,4 @@
-function [H, r, c] = harris_corner_detector(I, treshold)
+function [H, r1, c1] = harris_corner_detector(I, treshold1, treshold2)
 
 grayI = rgb2gray(I);
 % Gaussian derivative filters to x and to y
@@ -21,12 +21,8 @@ B = imfilter(Ix.*Iy, G);
 H = (A.*C - B.^2) - 0.04*((A+C).^2);
 
 % Check corners
-[r, c] = find(H > treshold);
-
-% set corners to green
-for i = 1:size(r)
-    I(r(i), c(i), :) = [0; 1; 0];
-end
+[r1, c1] = find(H > treshold1);
+[r2, c2] = find(H > treshold2);
 
 subplot(2, 2, 1)
 imshow(Ix)
@@ -37,7 +33,11 @@ imshow(Iy)
 title('gradient y direction')
 
 subplot(2, 2, 3)
-imshow(I)
-title('corners detected by harris')
+imshow(color_edge(I, r1, c1))
+title(strcat('corners detected by harris with treshold ', num2str(treshold1)))
+
+subplot(2, 2, 4)
+imshow(color_edge(I, r2, c2))
+title(strcat('corners detected by harris with treshold ', num2str(treshold2)))
 
 end
