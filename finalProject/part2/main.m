@@ -1,5 +1,8 @@
 %% main function 
 
+net = load('./data/pre_trained_model.mat') ;
+vl_simplenn_display(net.net);
+
 
 %% fine-tune cnn
 

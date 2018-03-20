@@ -12,7 +12,7 @@ motorbikes_test = readInData('./Caltech4/ImageData/motorbikes_test/');
 
 %% Extract Features Descriptors
 
-USE_AMOUNT_OF_DATA = 10;
+USE_AMOUNT_OF_DATA = 20;
  
 car_train_descriptors = extractFeatureDescriptors(cars_train, USE_AMOUNT_OF_DATA);
 airplane_train_descriptors = extractFeatureDescriptors(airplanes_train, USE_AMOUNT_OF_DATA);
@@ -60,7 +60,16 @@ motorbikesModel = train(trainY(:, 4), sparse(trainX));
 
 %% Evaluate
 
-predict(testY(:, 1), sparse(testX), carModel, '-b 1')
+[~, acc1, confidence1] = predict(testY(:, 1), sparse(testX), carModel);
+[~, acc2, confidence2] = predict(testY(:, 2), sparse(testX), airplanesModel);
+[~, acc3, confidence3] = predict(testY(:, 3), sparse(testX), facesModel);
+[~, acc4, confidence4] = predict(testY(:, 4), sparse(testX), motorbikesModel);
 
+[~, index1] = sortrows(confidence1, 'descend');
+[~, index2] = sortrows(confidence2, 'descend');
+[~, index3] = sortrows(confidence3, 'descend');
+[~, index4] = sortrows(confidence4, 'descend');
+
+map = (acc1(1) + acc2(1) + acc3(1) + acc4(1)) / 4;
 
 
