@@ -114,9 +114,10 @@ labels = [
 dataMean = mean(data(:, :, :, sets == 1), 4);
 data = bsxfun(@minus, data, dataMean);
 
-imdb.images.data = data ;
+
+imdb.images.data = single(data) ;
 imdb.images.labels = single(labels') ;
-imdb.images.set = sets;
+imdb.images.set = single(sets);
 imdb.meta.sets = {'train', 'val'} ;
 imdb.meta.classes = classes;
 
