@@ -1,5 +1,5 @@
-function [descriptors] = extractFeatures(image)
+function [descriptors] = extractFeatures(image, color)
 
     % should double check these parameters ;)
-    [~, descriptors] = vl_dsift(image, 'Step', 10);
+    [~, descriptors] = vl_phow(image, 'Color', color, 'Step', 10);
 end

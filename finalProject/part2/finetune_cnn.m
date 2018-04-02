@@ -32,6 +32,7 @@ net = update_model();
 
 if exist(opts.imdbPath, 'file')
   imdb = load(opts.imdbPath) ;
+  disp(imdb.images);
 else
   imdb = getCaltechIMDB() ;
   mkdir(opts.expDir) ;
@@ -70,7 +71,8 @@ end
 function [images, labels] = getSimpleNNBatch(imdb, batch)
 % -------------------------------------------------------------------------
 images = imdb.images.data(:,:,:,batch) ;
-labels = imdb.images.labels(1,batch) ;
+labels = imdb.images.labels(1, batch) ;
+
 if rand > 0.5, images=fliplr(images) ; end
 
 end
@@ -84,40 +86,43 @@ splits = {'train', 'test'};
 
 %% TODO: Implement your loop here, to create the data structure described in the assignment
 
-airplanesTrain = readInData('./ImageData/airplanes_train/');
-carsTrain = readInData('./ImageData/cars_train/');
-facesTrain = readInData('./ImageData/faces_train/');
-motorbikesTrain = readInData('./ImageData/motorbikes_train/');
+airplanesTrain = permute(readInData('./ImageData/airplanes_train/'), [1 2 3 4]);
+carsTrain = permute(readInData('./ImageData/cars_train/'), [1 2 3 4]);
+facesTrain = permute(readInData('./ImageData/faces_train/'), [1 2 3 4]);
+motorbikesTrain = permute(readInData('./ImageData/motorbikes_train/'), [1 2 3 4]);
 
-airplanesTest = readInData('./ImageData/airplanes_test/');
-carsTest = readInData('./ImageData/cars_test/');
-facesTest = readInData('./ImageData/faces_test/');
-motorbikesTest = readInData('./ImageData/motorbikes_test/');
+airplanesTest = permute(readInData('./ImageData/airplanes_test/'), [1 2 3 4]);
+carsTest = permute(readInData('./ImageData/cars_test/'), [1 2 3 4]);
+facesTest = permute(readInData('./ImageData/faces_test/'), [1 2 3 4]);
+motorbikesTest = permute(readInData('./ImageData/motorbikes_test/'), [1 2 3 4]);
 
-data = cat(4, airplanesTrain, carsTrain, facesTrain, motorbikesTrain, airplanesTest, carsTest, facesTest, motorbikesTest);
+data = single(cat(4, airplanesTrain, carsTrain, facesTrain, motorbikesTrain, airplanesTest, carsTest, facesTest, motorbikesTest));
 training_size = size(airplanesTrain, 4) + size(carsTrain, 4) + size(facesTrain, 4) + size(motorbikesTrain, 4);
 test_size = size(airplanesTest, 4) + size(carsTest, 4) + size(facesTest, 4) + size(motorbikesTest, 4);
 
-sets = [ones([training_size, 1]); ones([test_size, 1]) + 1];
+sets = single([
+    single(ones([training_size, 1])); 
+    single(ones([test_size, 1]) + 1);
+]);
 
-labels = [
-    ones([size(airplanesTrain, 4), 1]);
-    ones([size(carsTrain, 4), 1]) + 1;
-    ones([size(facesTrain, 4), 1]) + 2;
-    ones([size(motorbikesTrain, 4), 1]) + 3;
-    ones([size(airplanesTest, 4), 1]);
-    ones([size(carsTest, 4), 1]) + 1;
-    ones([size(facesTest, 4), 1]) + 2;
-    ones([size(motorbikesTest, 4), 1]) + 3;
-];
+labels = single([
+    single(ones([size(airplanesTrain, 4), 1]));
+    single(ones([size(carsTrain, 4), 1]) + 1);
+    single(ones([size(facesTrain, 4), 1]) + 2);
+    single(ones([size(motorbikesTrain, 4), 1]) + 3);
+    single(ones([size(airplanesTest, 4), 1]));
+    single(ones([size(carsTest, 4), 1]) + 1);
+    single(ones([size(facesTest, 4), 1]) + 2);
+    single(ones([size(motorbikesTest, 4), 1]) + 3);
+]);
 
 dataMean = mean(data(:, :, :, sets == 1), 4);
+
 data = bsxfun(@minus, data, dataMean);
 
-
-imdb.images.data = single(data) ;
+imdb.images.data = data ;
 imdb.images.labels = single(labels') ;
-imdb.images.set = single(sets);
+imdb.images.set = single(sets');
 imdb.meta.sets = {'train', 'val'} ;
 imdb.meta.classes = classes;
 
@@ -135,7 +140,7 @@ function [images] = readInData(folderName)
     nfiles = length(imagefiles);    % Number of files found
     
     image = imread(strcat(folderName, imagefiles(1).name));
-    images = zeros(32, 32, 3, nfiles);
+    images = single(zeros(32, 32, 3, nfiles));
 
     for ii=1:nfiles
        currentfilename = strcat(folderName, imagefiles(ii).name);
@@ -145,6 +150,6 @@ function [images] = readInData(folderName)
            currentimage = cat(3, currentimage, currentimage, currentimage);
        end
   
-       images(:, :, :, ii) = currentimage;  
+       images(:, :, :, ii) = im2single(currentimage);  
     end
 end
