@@ -1,6 +1,7 @@
-function [matrix, Y] = buildMatrix(descriptors, C)
+function [matrix, Y, backpointers] = buildMatrix(descriptors, C)
     matrix = [];
     Y = [];
+    backpointers = [];
     amount_of_classes = size(descriptors, 1);
     for i = 1:amount_of_classes
         d = descriptors(i, :);
@@ -9,7 +10,10 @@ function [matrix, Y] = buildMatrix(descriptors, C)
         newY(:, i) = 1;
         Y = [Y; newY];
         
+        
         for j = 1:size(d, 2)
+            
+            backpointers = [backpointers; [i j]];
             feature_vector = histcounts(descriptorsToWords(double(d{:, j}), C),  size(C, 1));
             matrix = [
                 matrix;

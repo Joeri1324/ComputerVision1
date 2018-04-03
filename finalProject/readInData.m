@@ -1,11 +1,15 @@
-function [images] = readInData(folderName)
+function [images, imagefileNames] = readInData(folderName)
 
-    imagefiles = dir(strcat(folderName, '*.jpg')); 
+    imagefiles = dir(strcat(folderName, '*.jpg'));
+    
+    imagefileNames = {};
     
     nfiles = length(imagefiles);    % Number of files found
 
     for ii=1:nfiles
        currentfilename = strcat(folderName, imagefiles(ii).name);
+       
+       imagefileNames{ii} = currentfilename;
        image = imread(currentfilename);
        
        % right now all images are converted to grayscale
