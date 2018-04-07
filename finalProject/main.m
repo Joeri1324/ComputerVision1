@@ -12,7 +12,7 @@
 
 %% Extract Features Descriptors
 
-USE_AMOUNT_OF_DATA = 50;
+USE_AMOUNT_OF_DATA = 10;
  
 car_train_descriptors = extractFeatureDescriptors(cars_train, USE_AMOUNT_OF_DATA,  'opponent');
 airplane_train_descriptors = extractFeatureDescriptors(airplanes_train, USE_AMOUNT_OF_DATA,  'opponent');

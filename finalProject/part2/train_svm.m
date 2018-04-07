@@ -1,12 +1,12 @@
-function train_svm(nets, data)
+function [train_pre, pre_labels, train_fine, fine_labels] = train_svm(nets, data)
 
 %% replace loss with the classification as we will extract features
 nets.pre_trained.layers{end}.type = 'softmax';
 nets.fine_tuned.layers{end}.type = 'softmax';
 
 %% extract features and train SVM classifiers, by validating their hyperparameters
-[svm.pre_trained.trainset, svm.pre_trained.testset] = get_svm_data(data, nets.pre_trained);
-[svm.fine_tuned.trainset,  svm.fine_tuned.testset] = get_svm_data(data, nets.fine_tuned);
+[svm.pre_trained.trainset, svm.pre_trained.testset, train_pre, ~, pre_labels, ~] = get_svm_data(data, nets.pre_trained);
+[svm.fine_tuned.trainset,  svm.fine_tuned.testset, train_fine, ~, fine_labels, ~] = get_svm_data(data, nets.fine_tuned);
 
 %% measure the accuracy of different settings
 [nn.accuracy] = get_nn_accuracy(nets.fine_tuned, data);
@@ -50,7 +50,7 @@ model = train(data.trainset.labels, data.trainset.features, sprintf('-c %f -s 0'
 
 end
 
-function [trainset, testset] = get_svm_data(data, net)
+function [trainset, testset, train_features, test_features, train_labels, test_labels] = get_svm_data(data, net)
 
 trainset.labels = [];
 trainset.features = [];
@@ -83,4 +83,9 @@ trainset.features = sparse(double(trainset.features'));
 testset.labels = double(testset.labels);
 testset.features = sparse(double(testset.features'));
 
+train_features = trainset.features;
+test_features = testset.features;
+
+train_labels = trainset.labels;
+test_labels = testset.labels;
 end

@@ -10,15 +10,14 @@ function [matrix, Y, backpointers] = buildMatrix(descriptors, C)
         newY(:, i) = 1;
         Y = [Y; newY];
         
-        
         for j = 1:size(d, 2)
             
             backpointers = [backpointers; [i j]];
             feature_vector = histcounts(descriptorsToWords(double(d{:, j}), C),  size(C, 1));
             matrix = [
                 matrix;
-                feature_vector
-            ];   
+                feature_vector / sum(feature_vector)
+            ];
         end
     end
 end
